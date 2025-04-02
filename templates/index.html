@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIMPLE AI UI</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>SIMPLE AI UI</h1>
+            <button id="theme-toggle" aria-label="Toggle dark mode" onclick="darkThemeToggle()">🌙</button>
+        </header>
+
+        <div id="main">
+            <div class="info-section">
+                <div class="info-box" id="connectionsInfo" aria-live="polite">
+                    <h3>CONNECTION INFO</h3>
+                    <p>Host: <span class="loading">loading...</span></p>
+                    <p>Port: <span class="loading">loading...</span></p>
+                    <p>Status: <span class="loading">loading...</span></p>
+                </div>
+                <div class="info-box" id="print_models" aria-live="polite">
+                    <h3>RUNNING MODELS</h3>
+                    <p class="loading">loading...</p>
+                </div>
+                <div class="info-box" id="print_active_models" aria-live="polite">
+                    <h3>AVAILABLE MODELS</h3>
+                    <p class="loading">loading...</p>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-box">
+                    <textarea id="prompt" placeholder="Enter your prompt here..."
+                        aria-label="Enter your prompt"></textarea>
+                    <label for="model-picker">SELECT MODEL</label>
+                    <select name="Models" id="model-picker" class="model-picker">
+                        <option value="auto">Auto</option>
+                    </select>
+                    <button id="prompt-btn" onclick="getAiResponse()">GO</button>
+                </div>
+            </div>
+
+            <div class="response-container">
+                <div class="response-card"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="./theme-toggle.js"></script>
+    <script src="/app.js"></script>
+</body>
+
+</html>
