@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 import requests
 from ollamaClient import OllamaClient
 import threading
@@ -37,6 +37,16 @@ worker_thread.start()
 @app.route("/")
 def index():
     return render_template("index.html"), 200
+
+
+@app.route("/static/<name>")
+def file_manager_static(name):
+    return send_from_directory(directory="./static", path=name), 200
+
+
+@app.route("/fonts/<name>")
+def file_manager_fonts(name):
+    return send_from_directory(directory="./fonts", path=name), 200
 
 
 @app.errorhandler(Exception)
