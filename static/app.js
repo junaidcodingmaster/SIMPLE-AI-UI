@@ -1,196 +1,150 @@
-// Function to ping the server and check connection status
-const pingServer = async () => {
+// Utility function for fetching data from a URL
+async function fetchData(url) {
   try {
-    const response = await fetch("/api/connection");
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    return await response.json();
+    return response.json();
   } catch (error) {
-    console.error("Error fetching /api/connection:", error);
+    console.error(`Error fetching ${url}:`, error);
     return null;
   }
-};
+}
 
-// Function to fetch model details from the server
-const fetchModelDetails = async () => {
-  try {
-    const response = await fetch("/api/connection/stats");
-    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching /api/connection/stats:", error);
-    return null;
-  }
-};
+// Server functions
+const pingServer = () => fetchData("/api/connection");
+const fetchModelDetails = () => fetchData("/api/connection/stats");
 
-// Function to format and display model details
-const displayModelDetails = (models, element) => {
-  if (!element) {
-    console.error("Element for displaying model details not found.");
-    return;
-  }
+// Display functions
+function displayConnectionDetails(connection, element) {
+  if (!element) return console.error("Missing element for connection details.");
+  element.innerHTML = connection
+    ? `<h3>CONNECTION INFO:</h3>
+       <p>Host: ${connection.host || "Unknown"}</p>
+       <p>Port: ${connection.port || "Unknown"}</p>
+       <p>Status: ${connection.status || "Unknown"} - CONNECTED</p>`
+    : "<h3>UNABLE TO CONNECT TO SERVER</h3>";
+}
 
+function displayModelDetails(models, element) {
+  if (!element) return console.error("Missing element for model details.");
+  const modelPicker = document.getElementById("model-picker");
   if (models?.available?.length) {
-    let formattedOutput = "<h3>MODELS:</h3>";
-    let formattedForModelPicker = "";
-
+    let modelHTML = "<h3>MODELS:</h3>";
+    let optionsHTML = "";
     models.available.forEach(({ name, model }) => {
-      formattedOutput += `<p>Name/Model: ${name}/${model}</p>`;
-      formattedForModelPicker += `<option value="${model}">${name}</option>`;
+      modelHTML += `<p>Name/Model: ${name}/${model}</p>`;
+      optionsHTML += `<option value="${model}">${name}</option>`;
     });
-
-    element.innerHTML = formattedOutput;
-    document.getElementById("model-picker").innerHTML = formattedForModelPicker;
+    element.innerHTML = modelHTML;
+    if (modelPicker) modelPicker.innerHTML = optionsHTML;
   } else {
     element.innerHTML = "<h3>No models found on the server.</h3>";
-    document.getElementById("model-picker").innerHTML =
-      "<option value=''>Unable to connect to server</option>";
+    if (modelPicker)
+      modelPicker.innerHTML =
+        "<option value=''>Unable to connect to server</option>";
   }
-};
+}
 
-// Function to display connection details
-const displayConnectionDetails = (connection, element) => {
-  if (!element) {
-    console.error("Element for displaying connection details not found.");
-    return;
-  }
-
-  if (connection) {
-    element.innerHTML = `<h3>CONNECTION INFO:</h3>
-                         <p>Host: ${connection.host || "Unknown"}</p>
-                         <p>Port: ${connection.port || "Unknown"}</p>
-                         <p>Status: ${
-                           connection.status || "Unknown"
-                         } - CONNECTED</p>`;
+function displayActiveModels(models, element) {
+  if (!element) return console.error("Missing element for active models.");
+  if (models?.active?.length) {
+    let html = "<h3>ACTIVE MODELS:</h3>";
+    models.active.forEach(({ name, model }) => {
+      html += `<p>Name/Model: ${name}/${model}</p>`;
+    });
+    element.innerHTML = html;
   } else {
-    element.innerHTML = "<h3>UNABLE TO CONNECT TO SERVER</h3>";
+    element.innerHTML = "<h3>Currently No Active Models Present.</h3>";
   }
-};
+}
 
-// Function to handle loading state
-const handleLoadingState = async (func, delay, loadingPage = false) => {
+// Handle UI loading state during async operations
+async function handleLoadingState(func, delay, showLoadingPage = false) {
   const inputBox = document.getElementById("prompt");
-  const inputBoxButton = document.getElementById("prompt-btn");
+  const inputButton = document.getElementById("prompt-btn");
   const mainContainer = document.getElementById("main");
 
-  if (!mainContainer) {
-    console.error("Main container element not found.");
-    return;
-  }
+  if (!mainContainer) return console.error("Missing main container.");
 
-  // Show loading state if enabled
-  if (loadingPage) {
-    mainContainer.innerHTML = `<h1>LOADING...</h1>`;
-  }
-
-  // Disable input elements if they exist
+  if (showLoadingPage) mainContainer.innerHTML = "<h1>LOADING...</h1>";
   if (inputBox) inputBox.disabled = true;
-  if (inputBoxButton) inputBoxButton.style.display = "none";
+  if (inputButton) inputButton.style.display = "none";
 
   try {
     await func();
   } catch (error) {
-    console.error("Error during loading function:", error);
+    console.error("Error during loading:", error);
     mainContainer.innerHTML = `<h1>ERROR: ${error.message}</h1>`;
   } finally {
     setTimeout(() => {
       if (inputBox) inputBox.disabled = false;
-      if (inputBoxButton) inputBoxButton.style.display = "block";
+      if (inputButton) inputButton.style.display = "block";
     }, delay);
   }
-};
+}
 
-// Main function to initialize the page
-const initializeDataPage = async () => {
+// Initialize the page by fetching and displaying connection and model details
+async function initializeDataPage() {
   const connectionsInfo = document.getElementById("connectionsInfo");
   const printModel = document.getElementById("print_models");
   const printActiveModel = document.getElementById("print_active_models");
 
-  if (!connectionsInfo || !printModel || !printActiveModel) {
-    console.error("One or more required elements not found.");
-    return;
-  }
+  if (!connectionsInfo || !printModel || !printActiveModel)
+    return console.error("One or more required elements not found.");
 
-  try {
-    const connection = await pingServer();
-    const models = await fetchModelDetails();
+  const connection = await pingServer();
+  const models = await fetchModelDetails();
 
-    displayConnectionDetails(connection, connectionsInfo);
-    displayModelDetails(models, printModel);
+  displayConnectionDetails(connection, connectionsInfo);
+  displayModelDetails(models, printModel);
+  displayActiveModels(models, printActiveModel);
+}
 
-    if (models?.active?.length) {
-      let formattedOutput = "<h3>ACTIVE MODELS:</h3>";
-
-      models.active.forEach(({ name, model }) => {
-        formattedOutput += `<p>Name/Model: ${name}/${model}</p>`;
-      });
-
-      printActiveModel.innerHTML = formattedOutput;
-    } else {
-      printActiveModel.innerHTML =
-        "<h3>Currently No Active Models Present.</h3>";
-    }
-  } catch (error) {
-    console.error("Error initializing page:", error);
-    connectionsInfo.innerHTML = "<h3>ERROR LOADING DATA</h3>";
-    printModel.innerHTML = "<h3>ERROR LOADING MODELS</h3>";
-    printActiveModel.innerHTML = "<h3>ERROR LOADING ACTIVE MODELS</h3>";
-  }
-};
-
-// Function to send a message to the AI and get a response
-const sendMessageToAI = async (prompt, model) => {
+// AI communication functions
+async function sendMessageToAI(prompt, model) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, model }),
     });
-
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    return await response.json();
+    return response.json();
   } catch (error) {
     console.error("Error sending message:", error);
     throw error;
   }
-};
+}
 
-// Function to print the response from AI
-const printResponse = (res, element) => {
-  if (!element) {
-    console.error("Element for displaying response from AI not found.");
-    return;
-  }
+function printResponse(res, element) {
+  if (!element) return console.error("Missing element for AI response.");
   element.innerHTML = res?.response?.length
     ? `<div class="response-card"><b>AI :</b> ${res.response}</div>`
     : "<h3>No response received.</h3>";
-};
+}
 
-// Function to handle sending a message
-const sendMessage = async () => {
+async function sendMessage() {
   const modelPicker = document.getElementById("model-picker");
   const prompt = document.getElementById("prompt");
-  const inputBoxButton = document.getElementById("prompt-btn");
+  const inputButton = document.getElementById("prompt-btn");
+  const responseContainer = document.getElementById("response-container");
 
-  const cardContainer = document.getElementById("response-container");
+  if (!modelPicker || !prompt || !responseContainer)
+    return console.error("Missing required elements for sending message.");
 
-  if (!modelPicker || !prompt || !cardContainer) {
-    console.error("Missing required elements.");
-    return;
-  }
-
-  inputBoxButton.style.display = "none";
-  cardContainer.style.display = "block";
-  cardContainer.innerHTML = "<h3>LOADING...</h3>";
+  inputButton.style.display = "none";
+  responseContainer.style.display = "block";
+  responseContainer.innerHTML = "<h3>LOADING...</h3>";
 
   try {
     const res = await sendMessageToAI(prompt.value, modelPicker.value);
-    printResponse(res, cardContainer);
+    printResponse(res, responseContainer);
   } catch (error) {
     console.error("Error sending message:", error);
-    cardContainer.innerHTML = "<h3>ERROR SENDING MESSAGE</h3>";
+    responseContainer.innerHTML = "<h3>ERROR SENDING MESSAGE</h3>";
   }
-  inputBoxButton.style.display = "block";
-};
+  inputButton.style.display = "block";
+}
 
 // Initialize the page when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {

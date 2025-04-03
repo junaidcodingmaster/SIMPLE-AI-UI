@@ -1,22 +1,23 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
 import requests
-from ollamaClient import OllamaClient
 import threading
 import queue
+from ollamaClient import OllamaClient
 
 # Initialize Flask app and Ollama client
 app = Flask(__name__)
 ai = OllamaClient()
 
-# Queue for handling requests
-request_queue = queue.Queue()
+# Queue for handling asynchronous chat requests
+request_queue: queue.Queue = queue.Queue()
 
 
-def process_requests():
+def process_requests() -> None:
+    """Worker thread function to process queued chat requests."""
     while True:
         task = request_queue.get()
         if task is None:
-            break  # Exit thread when None is received
+            break  # Exit when a termination signal is received
 
         request_data, response_queue = task
         prompt = request_data.get("prompt")
@@ -25,32 +26,27 @@ def process_requests():
         if not prompt or not model:
             response_queue.put({"error": "Invalid request data"})
         else:
-            response = ai.chat(prompt=prompt, model=model)
+            response = ai.chat(model=model, prompt=prompt)
             response_queue.put({"response": response})
 
 
-# Start the background worker thread
-worker_thread = threading.Thread(target=process_requests, daemon=True)
-worker_thread.start()
+# Start background worker thread
+threading.Thread(target=process_requests, daemon=True).start()
 
 
+# Routes
 @app.route("/")
 def index():
     return render_template("index.html"), 200
 
 
-@app.route("/static/<name>")
-def file_manager_static(name):
-    return send_from_directory(directory="./static", path=name), 200
-
-
-@app.route("/fonts/<name>")
-def file_manager_fonts(name):
-    return send_from_directory(directory="./fonts", path=name), 200
+@app.route("/static/<path:filename>")
+def serve_static(filename: str):
+    return send_from_directory("static", filename), 200
 
 
 @app.errorhandler(Exception)
-def error_page(error):
+def handle_error(error: Exception):
     if hasattr(error, "code") and error.code == 404:
         return render_template("404.html"), 404
     return render_template("error.html", error=str(error)), 500
@@ -62,7 +58,7 @@ def api_connection():
         res = requests.get("http://localhost:11434", timeout=5)
         status_code = res.status_code
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        print("[LOG] ERROR: UNABLE TO CONNECT TO SERVER")
+        app.logger.error("Unable to connect to server")
         status_code = 404
 
     return (
@@ -79,25 +75,24 @@ def api_connection():
 
 @app.route("/api/connection/stats")
 def api_connection_stats():
-    list_of_models = ai.list_models()
-    list_of_active_models = ai.list_active_models()
+    models = ai.list_models()
+    active_models = ai.list_active_models()
 
-    if not list_of_models and not list_of_active_models:
+    if not models and not active_models:
         return jsonify({"error": "No models found"}), 404
 
-    return jsonify({"available": list_of_models, "active": list_of_active_models}), 200
+    return jsonify({"available": models, "active": active_models}), 200
 
 
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
     data = request.json
-    response_queue = queue.Queue()
+    response_queue: queue.Queue = queue.Queue()
     request_queue.put((data, response_queue))
-
-    # Wait for the response from the queue
-    response = response_queue.get()
-    return jsonify(response), 200 if "response" in response else 400
+    response = response_queue.get()  # Blocking wait for response
+    status = 200 if "response" in response else 400
+    return jsonify(response), status
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
