@@ -84,7 +84,7 @@ const handleLoadingState = async (func, delay, loadingPage = false) => {
 
   // Disable input elements if they exist
   if (inputBox) inputBox.disabled = true;
-  if (inputBoxButton) inputBoxButton.disabled = true;
+  if (inputBoxButton) inputBoxButton.style.display = "none";
 
   try {
     await func();
@@ -94,7 +94,7 @@ const handleLoadingState = async (func, delay, loadingPage = false) => {
   } finally {
     setTimeout(() => {
       if (inputBox) inputBox.disabled = false;
-      if (inputBoxButton) inputBoxButton.disabled = false;
+      if (inputBoxButton) inputBoxButton.style.display = "block";
     }, delay);
   }
 };
@@ -161,7 +161,7 @@ const printResponse = (res, element) => {
     return;
   }
   element.innerHTML = res?.response?.length
-    ? `<div class="response-card">${res.response}</div>`
+    ? `<div class="response-card"><b>AI :</b> ${res.response}</div>`
     : "<h3>No response received.</h3>";
 };
 
@@ -169,6 +169,8 @@ const printResponse = (res, element) => {
 const sendMessage = async () => {
   const modelPicker = document.getElementById("model-picker");
   const prompt = document.getElementById("prompt");
+  const inputBoxButton = document.getElementById("prompt-btn");
+
   const cardContainer = document.getElementById("response-container");
 
   if (!modelPicker || !prompt || !cardContainer) {
@@ -176,7 +178,9 @@ const sendMessage = async () => {
     return;
   }
 
+  inputBoxButton.style.display = "none";
   cardContainer.style.display = "block";
+  cardContainer.innerHTML = "<h3>LOADING...</h3>";
 
   try {
     const res = await sendMessageToAI(prompt.value, modelPicker.value);
@@ -185,6 +189,7 @@ const sendMessage = async () => {
     console.error("Error sending message:", error);
     cardContainer.innerHTML = "<h3>ERROR SENDING MESSAGE</h3>";
   }
+  inputBoxButton.style.display = "block";
 };
 
 // Initialize the page when the DOM is fully loaded
