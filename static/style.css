@@ -278,3 +278,23 @@ body.dark-theme .model-picker-wrapper::after {
         font-size: 0.9rem;
     }
 }
+
+/* Error message container */
+.error-div {
+    background-color: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text color */
+    border: 1px solid #f5c6cb; /* Light red border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 15px; /* Padding inside the div */
+    margin: 20px 0; /* Margin above and below the div */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    font-family: Arial, sans-serif; /* Font style */
+}
+
+/* Error text styling */
+.error-text {
+    margin: 0; /* Remove default margin */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+}

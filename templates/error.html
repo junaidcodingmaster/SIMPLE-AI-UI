@@ -16,10 +16,11 @@
             <button id="theme-toggle" aria-label="Toggle dark mode" onclick="darkThemeToggle()">🌙</button>
         </header>
 
-        <h1>PAGE NOT FOUND!</h1>
-        <p>The Page your looking for is does not exist!</p>
-        <p>Go to <a href="/">HOME</a> page.</p>
-    <script src="/static/theme-toggle.js"></script>
+        <h1>Opps! Something went wrong!</h1>
+        <div class="error-div">
+            <p class="error-text">{{error}}</p>
+        </div>
+        <script src="/static/theme-toggle.js"></script>
 </body>
 
 </html>

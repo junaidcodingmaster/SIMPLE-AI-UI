@@ -1,82 +1,105 @@
 import requests
 import json
 
-ollama_serve = "http://localhost:11434"
-collection_of_apis = {
+# Constants
+OLLAMA_SERVER = "http://localhost:11434"
+API_ENDPOINTS = {
     "list-models": "/api/tags",
     "list-active-models": "/api/ps",
     "chat": "/api/chat",
 }
 
-def get_data(url):
+
+# Helper functions
+def fetch_data(url):
+    """Fetch data from a given URL using a GET request."""
     try:
-        res = requests.get(url, timeout=5)
-        data = res.json()
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        print("[LOG] ERROR  : UNABLE TO CONNECT TO SERVER")
-        data = {}
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.json()
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        print(f"[LOG] ERROR: Unable to connect to server - {e}")
+        return {}
+    except requests.exceptions.RequestException as e:
+        print(f"[LOG] ERROR: Request failed - {e}")
+        return {}
 
-    return data
 
-def post_data(url, data):
-    headers = {'Content-Type': 'application/json'}
+def send_data(url, data):
+    """Send data to a given URL using a POST request."""
+    headers = {"Content-Type": "application/json"}
     try:
-        res = requests.post(url, json=data, headers=headers,stream=True)
-        content = res.text  # parse response as JSON
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        print("[LOG] ERROR : UNABLE TO CONNECT TO SERVER")
-        content = {}
+        response = requests.post(url, json=data, headers=headers, stream=True)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.text  # Return text instead of raw content
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        print(f"[LOG] ERROR: Unable to connect to server - {e}")
+        return ""
+    except requests.exceptions.RequestException as e:
+        print(f"[LOG] ERROR: Request failed - {e}")
+        return ""
 
-    return content
 
+# Ollama Client Class
 class OllamaClient:
-
     @staticmethod
-    def listModels():
-        data = get_data(ollama_serve + collection_of_apis.get("list-models"))
-
-        if data == {}:
+    def list_models():
+        """Fetch and return a list of available models."""
+        data = fetch_data(OLLAMA_SERVER + API_ENDPOINTS["list-models"])
+        if not data:
             return []
 
-        filter_data = data.get('models')   # should be 'models' not 'model'
-
-        results = []
-        for item in filter_data:
-            results.append({"name": item.get("name"), "model": item.get("model")})
-
-        return results
+        models = data.get("models", [])
+        return [
+            {"name": item.get("name", ""), "model": item.get("model", "")}
+            for item in models
+        ]
 
     @staticmethod
-    def listActiveModels():
-        data = get_data(ollama_serve + collection_of_apis.get("list-active-models"))
-
-        if data=={}:
+    def list_active_models():
+        """Fetch and return a list of active models."""
+        data = fetch_data(OLLAMA_SERVER + API_ENDPOINTS["list-active-models"])
+        if not data:
             return []
 
-        filter_data = data.get("models")  # should be 'models' not 'model'
-
-        results = []
-        for item in filter_data:
-            results.append({"name": item.get("name"), "model": item.get("model")})
-
-        return results
+        models = data.get("models", [])
+        return [
+            {"name": item.get("name", ""), "model": item.get("model", "")}
+            for item in models
+        ]
 
     @staticmethod
     def chat(model, prompt):
+        """Send a chat prompt to a specified model and return the response."""
         data = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
         }
 
-        res = post_data(ollama_serve + collection_of_apis.get("chat"), data)
-        # return res
-        lines = res.split('\n')[:-1]
-        parsed_json = []
-        for line in lines:
-            parsed_json.append(json.loads(line))
+        response_text = send_data(OLLAMA_SERVER + API_ENDPOINTS["chat"], data)
+        if not response_text:
+            return ""
 
-        results=[]
-        for item in parsed_json:
-            results.append(item["message"]["content"])
+        # Parse the response (assuming it's a stream of JSON objects)
+        parsed_lines = []
+        for line in response_text.split("\n"):
+            if line.strip():
+                try:
+                    parsed_lines.append(json.loads(line))
+                except json.JSONDecodeError as e:
+                    print(f"[LOG] ERROR: Failed to parse JSON - {e}")
 
-        return "".join(results)
+        # Extract the message contents
+        response_messages = [
+            item.get("message", {}).get("content", "")
+            for item in parsed_lines
+            if "message" in item
+        ]
+
+        response_str = "".join(response_messages)
+
+        print(
+            f"[LOG] INCOMING DATA:\nmodel: {model}\nprompt: {prompt}\nOUTGOING:\nResponse: {response_str}"
+        )
+
+        return response_str
