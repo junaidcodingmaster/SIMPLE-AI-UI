@@ -36,15 +36,7 @@ This file contains environment variables that configure the server and applicati
   - **Default Value**: `1000`
   - **Example**: 
     ```env
-    SIMPLE_AI_UI_AUTH_NO_OF_USERS_PER_DAY=1000
-    ```
-
-- **`SIMPLE_AI_UI_AUTH_SHOW_USER_STATS`**
-  - **Description**: A boolean value that determines whether to show user statistics.
-  - **Default Value**: `true`
-  - **Example**: 
-    ```env
-    SIMPLE_AI_UI_AUTH_SHOW_USER_STATS=true
+    SIMPLE_AI_UI_AUTH_NO_OF_USERS_PER_DAY=1
     ```
 
 ### 3. API Request Configuration
@@ -55,14 +47,6 @@ This file contains environment variables that configure the server and applicati
   - **Example**: 
     ```env
     SIMPLE_AI_UI_API_LIMIT_OF_REQS_PER_DAY=1000
-    ```
-
-- **`SIMPLE_AI_UI_API_NO_OF_DEVICES`**
-  - **Description**: The maximum number of devices that can make API requests.
-  - **Default Value**: `1000`
-  - **Example**: 
-    ```env
-    SIMPLE_AI_UI_API_NO_OF_DEVICES=1000
     ```
 
 ---
@@ -80,9 +64,7 @@ SIMPLE_AI_UI_SERVER_PORT=5000
 
 # User Configuration
 SIMPLE_AI_UI_AUTH_USERS=joe:1234
-SIMPLE_AI_UI_AUTH_NO_OF_USERS_PER_DAY=1000
-SIMPLE_AI_UI_AUTH_SHOW_USER_STATS=true      
+SIMPLE_AI_UI_AUTH_NO_OF_USERS_PER_DAY=1
 
 # API Request Configuration
-SIMPLE_AI_UI_API_LIMIT_OF_REQS_PER_DAY=1000     
-SIMPLE_AI_UI_API_NO_OF_DEVICES=1000             
+SIMPLE_AI_UI_API_LIMIT_OF_REQS_PER_DAY=1000               

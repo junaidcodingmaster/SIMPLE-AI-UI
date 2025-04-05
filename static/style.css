@@ -27,6 +27,7 @@
   --box-bg: #fff;
   --shadow-color: rgba(0, 0, 0, 0.1);
   --info-box-shadow: 0 4px 8px var(--shadow-color);
+  --border-radius: 8px;
 }
 
 body.dark-theme {
@@ -73,34 +74,29 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px; /* Ensures a good tap/click area */
+  width: 44px;
   height: 44px;
   cursor: pointer;
   transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
-  border-radius: 50%; /* Makes it circular */
+  border-radius: 50%;
   outline: none;
 }
-
 #theme-toggle img {
   width: 24px;
   height: 24px;
   transition: transform 0.3s ease-in-out;
 }
-
 #theme-toggle:hover {
   transform: scale(1.15);
-  background-color: rgba(0, 0, 0, 0.05); /* Light hover effect */
+  background-color: rgba(0, 0, 0, 0.05);
 }
-
 #theme-toggle:active {
-  transform: scale(0.95); /* Gives a subtle press effect */
+  transform: scale(0.95);
 }
-
 #theme-toggle:focus {
-  outline: 2px solid #007bff; /* High contrast focus ring for accessibility */
+  outline: 2px solid #007bff;
   outline-offset: 3px;
 }
-
 
 /* ========== Info Section ========== */
 .info-section {
@@ -111,7 +107,7 @@ header h1 {
 }
 .info-box {
   background-color: var(--box-bg);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 20px;
   box-shadow: var(--info-box-shadow);
 }
@@ -129,7 +125,7 @@ header h1 {
   height: 100px;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   resize: none;
   font-size: 20px;
   transition: border-color 0.3s ease;
@@ -141,7 +137,7 @@ header h1 {
   margin-top: 10px;
   padding: 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background-color: var(--primary-color);
   color: #fff;
   cursor: pointer;
@@ -161,7 +157,7 @@ header h1 {
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   background-color: var(--box-bg);
   color: var(--text-color);
   appearance: none;
@@ -184,24 +180,74 @@ header h1 {
   margin-top: 20px;
   padding: 20px;
   background-color: var(--box-bg);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   box-shadow: 0 4px 6px var(--shadow-color);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 .response-container:hover {
   box-shadow: 0 6px 12px var(--shadow-color);
 }
+
+/* ========== Response Card ========== */
 .response-card {
+  position: relative;
   padding: 15px;
-  background-color: var(--response-bg);
+  background-color: var(--box-bg);
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 .response-card p {
   margin: 0;
   font-size: 1rem;
   line-height: 1.5;
+}
+
+/* Copy-to-Clipboard Button */
+.copy-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.copy-button:hover {
+  background-color: var(--primary-hover);
+}
+
+/* ========== Code Block ========== */
+.response-card pre {
+  position: relative;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  margin: 10px 0;
+}
+.code-copy-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: var(--primary-color);
+  color: #fff;
+ border: none;
+  border-radius: var(--border-radius);
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.code-copy-button:hover {
+  background-color: var(--primary-hover);
 }
 
 /* ========== Error Message ========== */
@@ -234,4 +280,36 @@ header h1 {
     padding: 8px;
     font-size: 0.9rem;
   }
+}
+
+form {
+  width: 400px;
+  margin: 20px auto;
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, .4);
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+  border: none;
+  background: #e6e6e6;
+}
+
+input[type="submit"] {
+  width: 100%;
+  padding: 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+input[type="submit"]:hover {
+  background: #45a049;
 }

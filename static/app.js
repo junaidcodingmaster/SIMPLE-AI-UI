@@ -1,4 +1,9 @@
-// Utility function for fetching data from a URL
+// ===================== UTILITY FUNCTIONS =====================
+/**
+ * Fetches data from a URL and returns the JSON response.
+ * @param {string} url - The URL to fetch data from.
+ * @returns {Promise<Object|null>} - The JSON response or null if an error occurs.
+ */
 async function fetchData(url) {
   try {
     const response = await fetch(url);
@@ -10,11 +15,42 @@ async function fetchData(url) {
   }
 }
 
-// Server functions
+function copyToClipboard(type) {
+  let textToCopy;
+  if (type === "response") {
+    textToCopy = document.querySelector(".response-card p").innerText;
+  } else if (type === "code") {
+    textToCopy = document.querySelector(".response-card pre code").innerText;
+  }
+  navigator.clipboard
+    .writeText(textToCopy)
+    .then(() => {
+      alert("Copied to clipboard!");
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+    });
+}
+
+// ===================== SERVER FUNCTIONS =====================
+/**
+ * Pings the server to check the connection status.
+ * @returns {Promise<Object|null>} - The connection details or null if an error occurs.
+ */
 const pingServer = () => fetchData("/api/connection");
+
+/**
+ * Fetches details about available and active models from the server.
+ * @returns {Promise<Object|null>} - The model details or null if an error occurs.
+ */
 const fetchModelDetails = () => fetchData("/api/connection/stats");
 
-// Display functions
+// ===================== DISPLAY FUNCTIONS =====================
+/**
+ * Displays the server connection details in the specified element.
+ * @param {Object|null} connection - The connection details.
+ * @param {HTMLElement} element - The element to display the details in.
+ */
 function displayConnectionDetails(connection, element) {
   if (!element) return console.error("Missing element for connection details.");
   element.innerHTML = connection
@@ -25,6 +61,11 @@ function displayConnectionDetails(connection, element) {
     : "<h3>UNABLE TO CONNECT TO SERVER</h3>";
 }
 
+/**
+ * Displays the available models in the specified element and updates the model picker dropdown.
+ * @param {Object|null} models - The model details.
+ * @param {HTMLElement} element - The element to display the details in.
+ */
 function displayModelDetails(models, element) {
   if (!element) return console.error("Missing element for model details.");
   const modelPicker = document.getElementById("model-picker");
@@ -45,6 +86,11 @@ function displayModelDetails(models, element) {
   }
 }
 
+/**
+ * Displays the active models in the specified element.
+ * @param {Object|null} models - The active model details.
+ * @param {HTMLElement} element - The element to display the details in.
+ */
 function displayActiveModels(models, element) {
   if (!element) return console.error("Missing element for active models.");
   if (models?.active?.length) {
@@ -58,7 +104,13 @@ function displayActiveModels(models, element) {
   }
 }
 
-// Handle UI loading state during async operations
+// ===================== LOADING STATE MANAGEMENT =====================
+/**
+ * Handles the UI loading state during async operations.
+ * @param {Function} func - The async function to execute.
+ * @param {number} delay - The delay before re-enabling UI elements.
+ * @param {boolean} showLoadingPage - Whether to show a loading page.
+ */
 async function handleLoadingState(func, delay, showLoadingPage = false) {
   const inputBox = document.getElementById("prompt");
   const inputButton = document.getElementById("prompt-btn");
@@ -83,7 +135,10 @@ async function handleLoadingState(func, delay, showLoadingPage = false) {
   }
 }
 
-// Initialize the page by fetching and displaying connection and model details
+// ===================== PAGE INITIALIZATION =====================
+/**
+ * Initializes the page by fetching and displaying connection and model details.
+ */
 async function initializeDataPage() {
   const connectionsInfo = document.getElementById("connectionsInfo");
   const printModel = document.getElementById("print_models");
@@ -100,7 +155,13 @@ async function initializeDataPage() {
   displayActiveModels(models, printActiveModel);
 }
 
-// AI communication functions
+// ===================== AI COMMUNICATION FUNCTIONS =====================
+/**
+ * Sends a message to the AI and returns the response.
+ * @param {string} prompt - The user's prompt.
+ * @param {string} model - The selected model.
+ * @returns {Promise<Object>} - The AI's response.
+ */
 async function sendMessageToAI(prompt, model) {
   try {
     const response = await fetch("/api/chat", {
@@ -116,6 +177,11 @@ async function sendMessageToAI(prompt, model) {
   }
 }
 
+/**
+ * Displays the AI's response in the specified element.
+ * @param {Object} res - The AI's response.
+ * @param {HTMLElement} element - The element to display the response in.
+ */
 function printResponse(res, element) {
   if (!element) return console.error("Missing element for AI response.");
   element.innerHTML = res?.response?.length
@@ -123,6 +189,9 @@ function printResponse(res, element) {
     : "<h3>No response received.</h3>";
 }
 
+/**
+ * Handles sending a message to the AI and displaying the response.
+ */
 async function sendMessage() {
   const modelPicker = document.getElementById("model-picker");
   const prompt = document.getElementById("prompt");
@@ -142,11 +211,12 @@ async function sendMessage() {
   } catch (error) {
     console.error("Error sending message:", error);
     responseContainer.innerHTML = "<h3>ERROR SENDING MESSAGE</h3>";
+  } finally {
+    inputButton.style.display = "block";
   }
-  inputButton.style.display = "block";
 }
 
-// Initialize the page when the DOM is fully loaded
+// ===================== INITIALIZE ON DOM CONTENT LOADED =====================
 document.addEventListener("DOMContentLoaded", () => {
   handleLoadingState(initializeDataPage, 1000);
 });

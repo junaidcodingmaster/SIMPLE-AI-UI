@@ -13,11 +13,12 @@
         <header>
             <h1>SIMPLE AI UI</h1>
             <button id="theme-toggle" aria-label="Toggle dark mode" onclick="darkThemeToggle()">
+                <img src="/static/svgs/light-mode.svg" alt="Toggle Theme" width="24" height="24" />
             </button>
-
         </header>
 
         <div id="main">
+            <!-- Info Section -->
             <div class="info-section">
                 <div class="info-box" id="connectionsInfo" aria-live="polite">
                     <h3>CONNECTION INFO</h3>
@@ -35,6 +36,7 @@
                 </div>
             </div>
 
+            <!-- Input Section -->
             <div class="input-section">
                 <div class="input-box">
                     <textarea id="prompt" placeholder="Enter your prompt here..."
@@ -47,13 +49,21 @@
                 </div>
             </div>
 
+            <!-- Response Section -->
             <div class="response-container" id="response-container" style="display: none;">
-                <div class="response-card">LOADING...</div>
+                <div class="response-card">
+                    <button class="copy-button" onclick="copyToClipboard('response')">Copy Response</button>
+                    <div id="response-text">LOADING...</div>
+                    <pre>
+                        <code id="response-code">Your code snippet here.</code>
+                        <button class="code-copy-button" onclick="copyToClipboard('code')">Copy Code</button>
+                    </pre>
+                </div>
             </div>
-
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="/static/theme-toggle.js"></script>
     <script src="/static/app.js"></script>
 </body>
