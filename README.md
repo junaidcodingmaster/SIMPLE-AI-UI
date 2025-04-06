@@ -111,7 +111,3 @@ Made By [Junaid](https://abujuni.dev)
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
-## Alert
-- Currently this project is not opensource.
-- I promise Soon it will be opensource.
