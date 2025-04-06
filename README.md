@@ -43,20 +43,20 @@ Simple AI UI is a minimalist and lightweight web GUI that allows you to host you
 
 ## Flavors
 
-- **Python** - Code Name: Simple-AI-UI-EASY
+- **Python** - Code Name: Simple-AI-UI-MAIN (current repo)
 - **Rust-lang** - Code Name: Simple-AI-UI-ThunderBOLT [COMING SOON]
 
 ---
 
 ## APIs
 
-For detailed documentation, refer to `./docs/apis.md`.
+For detailed documentation, refer to [`APIS`](./docs/apis.md).
 
 ---
 
 ## Server Configuration
 
-For detailed documentation, refer to `./docs/server-config.md`.
+For detailed documentation, refer to [`Server Configuration`](./docs/server-config.md).
 
 ---
 
