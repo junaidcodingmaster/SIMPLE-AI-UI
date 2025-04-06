@@ -6,20 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SIMPLE AI UI</title>
     <link rel="stylesheet" href="/static/style.css" />
+    <link rel="shortcut icon" href="/static/logo/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
     <div class="app-container">
         <header>
+            <img src="/static/logo/icon.png" alt="Icon of Simple AI UI" width="100px">
             <h1>SIMPLE AI UI</h1>
             <button id="theme-toggle" aria-label="Toggle dark mode" onclick="darkThemeToggle()">🌙</button>
         </header>
 
         <h1>LOGIN</h1>
         <form action="{{url}}" method="post">
-            <input type="text" name="username" id="username" placeholder="Username"/>
+            <input type="text" name="username" id="username" placeholder="Username" />
             <input type="password" name="password" id="password" placeholder="Password" />
-            <input type="submit" value="submit"/>
+            <input type="submit" value="submit" />
         </form>
         <script src="/static/theme-toggle.js"></script>
 </body>

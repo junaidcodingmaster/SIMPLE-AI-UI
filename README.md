@@ -1,3 +1,5 @@
+![banner of Simple AI UI](./static/logo/banner.png)
+
 # Simple AI UI
 
 Simple AI UI is a minimalist and lightweight web GUI that allows you to host your own AI on your local network or the internet.
